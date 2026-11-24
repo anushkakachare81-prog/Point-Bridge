@@ -8,8 +8,11 @@ import type { Session } from "@supabase/supabase-js";
 import CustomerDashboard from "./CustomerDashboard";
 import ShopDashboard from "./ShopDashboard";
 import AdminDashboard from "./AdminDashboard";
+import { useMetaMask } from "./hooks/useMetaMask";
 
 function App() {
+  const { account, status, connect, disconnect, errorMessage, clearError } =
+    useMetaMask();
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState("");
   const [showSplash, setShowSplash] = useState(true);
@@ -112,9 +115,25 @@ function App() {
       <div className="home-page">
         <nav className="navbar">
           <h2>◇ Point Bridge</h2>
-          <button onClick={() => setRole("")}>
-            ← Back to Home
-          </button>
+          <div className="navbar-actions">
+            {status === "connected" && account && (
+              <span
+                style={{
+                  background: "#1c1936",
+                  border: "1px solid #a17aff66",
+                  borderRadius: "10px",
+                  padding: "8px 14px",
+                  fontSize: "13px",
+                  color: "#c5a5ff",
+                }}
+              >
+                ● {account.slice(0, 6)}...{account.slice(-4)}
+              </span>
+            )}
+            <button onClick={() => setRole("")}>
+              ← Back to Home
+            </button>
+          </div>
         </nav>
         <CustomerDashboard />
       </div>
@@ -126,9 +145,25 @@ function App() {
       <div className="home-page">
         <nav className="navbar">
           <h2>◇ Point Bridge</h2>
-          <button onClick={() => setRole("")}>
-            ← Back to Home
-          </button>
+          <div className="navbar-actions">
+            {status === "connected" && account && (
+              <span
+                style={{
+                  background: "#1c1936",
+                  border: "1px solid #a17aff66",
+                  borderRadius: "10px",
+                  padding: "8px 14px",
+                  fontSize: "13px",
+                  color: "#c5a5ff",
+                }}
+              >
+                ● {account.slice(0, 6)}...{account.slice(-4)}
+              </span>
+            )}
+            <button onClick={() => setRole("")}>
+              ← Back to Home
+            </button>
+          </div>
         </nav>
         <ShopDashboard />
       </div>
@@ -140,9 +175,25 @@ function App() {
       <div className="home-page">
         <nav className="navbar">
           <h2>◇ Point Bridge</h2>
-          <button onClick={() => setRole("")}>
-            ← Back to Home
-          </button>
+          <div className="navbar-actions">
+            {status === "connected" && account && (
+              <span
+                style={{
+                  background: "#1c1936",
+                  border: "1px solid #a17aff66",
+                  borderRadius: "10px",
+                  padding: "8px 14px",
+                  fontSize: "13px",
+                  color: "#c5a5ff",
+                }}
+              >
+                ● {account.slice(0, 6)}...{account.slice(-4)}
+              </span>
+            )}
+            <button onClick={() => setRole("")}>
+              ← Back to Home
+            </button>
+          </div>
         </nav>
         <AdminDashboard />
       </div>
@@ -155,11 +206,54 @@ function App() {
         <h2>◇ Point Bridge</h2>
 
         <div className="navbar-actions">
-  <span>Points • Rewards • Benefits</span>
-  
-</div>
-
+          <span>Points • Rewards • Benefits</span>
+          {status === "connected" && account ? (
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span
+                style={{
+                  background: "#1c1936",
+                  border: "1px solid #a17aff66",
+                  borderRadius: "10px",
+                  padding: "8px 14px",
+                  fontSize: "13px",
+                  color: "#c5a5ff",
+                }}
+              >
+                ● {account.slice(0, 6)}...{account.slice(-4)}
+              </span>
+              <button className="connect-wallet-btn" onClick={disconnect}>
+                Disconnect
+              </button>
+            </div>
+          ) : (
+            <button
+              className="connect-wallet-btn"
+              onClick={connect}
+              disabled={status === "connecting"}
+            >
+              {status === "connecting" ? "Connecting..." : "Connect Wallet"}
+            </button>
+          )}
+        </div>
       </nav>
+
+      {errorMessage && (
+        <div
+          className="customer-message"
+          style={{
+            maxWidth: "600px",
+            margin: "16px auto",
+            cursor: "pointer",
+            background: "#2a1226",
+            border: "1px solid #ff446655",
+            color: "#ff9999",
+          }}
+          onClick={clearError}
+          title="Click to dismiss"
+        >
+          {errorMessage} (click to dismiss)
+        </div>
+      )}
 
       <main>
         <section className="hero" id="home">
@@ -188,23 +282,23 @@ function App() {
 
           <div className="role-cards">
             <button
-  onClick={async () => {
-    const { error } = await supabase.auth.signOut();
+              onClick={async () => {
+                const { error } = await supabase.auth.signOut();
 
-    if (error) {
-      alert("Logout failed. Please try again.");
-      return;
-    }
+                if (error) {
+                  alert("Logout failed. Please try again.");
+                  return;
+                }
 
-    setSession(null);
-    setRole("customer");
-  }}
->
-  <span>01</span>
-  <strong>Customer</strong>
-  <small>View Points & Rewards</small>
-  <b>Open Dashboard →</b>
-</button>
+                setSession(null);
+                setRole("customer");
+              }}
+            >
+              <span>01</span>
+              <strong>Customer</strong>
+              <small>View Points & Rewards</small>
+              <b>Open Dashboard →</b>
+            </button>
 
             <button onClick={() => setRole("shop")}>
               <span>02</span>
